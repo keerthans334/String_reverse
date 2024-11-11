@@ -1,0 +1,217 @@
+mysql> select*from account;
++--------+---------------+---------+
+| accno  | branch_name   | balance |
++--------+---------------+---------+
+| 123456 | koramangala   |    5000 |
+| 123457 | sadashivnagar |   35000 |
+| 123458 | vittalnagar   |   60000 |
+| 123461 | maruthinagar  |   20000 |
+| 123462 | sadashivnagar |   40000 |
++--------+---------------+---------+
+mysql> select*from branch;
++---------------+-------------+---------+
+| branch_name   | branch_city | assests |
++---------------+-------------+---------+
+| kasthurinagar | delhi       |  154330 |
+| koramangala   | bengaluru   |  200567 |
+| maruthinagar  | hydrabad    |  200568 |
+| sadashivnagar | bengaluru   |  154330 |
+| vittalnagar   | hydrabad    |   35000 |
++---------------+-------------+---------+
+mysql> select*from loan;
++---------+---------------+---------+
+| loan_no | branch_name   | amount  |
++---------+---------------+---------+
+|     231 | sadashivnagar | 50500.5 |
+|     232 | vittalnagar   |   25000 |
+|     233 | maruthinagar  | 60300.3 |
+|     234 | kasthurinagar | 50500.5 |
++---------+---------------+---------+
+mysql> select*from customer;
++-----------+---------------+-----------+
+| cust_name | cust_street   | cust_city |
++-----------+---------------+-----------+
+| abhay     | kamalanagar   | tumkur    |
+| ikith     | dhuranagar    | hydrabad  |
+| kavya     | sadashivngar  | bengaluru |
+| kshamitha | marutilayout  | tmkur     |
+| sheeta    | kasthurinagar | bengaluru |
++-----------+---------------+-----------+
+mysql> select*From borrower;
++-----------+---------+
+| cust_name | loan_no |
++-----------+---------+
+| kavya     |     231 |
+| kshamitha |     232 |
+| abhay     |     234 |
+
+mysql> select*from depositor;
++-----------+--------+
+| cust_name | accno  |
++-----------+--------+
+| abhay     | 123456 |
+| kavya     | 123457 |
+| kshamitha | 123458 |
+| ikith     | 123461 |
++-----------+--------+
+mysql> select accno,balance from account where balance>20000;
++--------+---------+
+| accno  | balance |
++--------+---------+
+| 123457 |   35000 |
+| 123458 |   60000 |
+| 123462 |   40000 |
++--------+---------+
+mysql> select balance,accno from account order by balance asc;
++---------+--------+
+| balance | accno  |
++---------+--------+
+|    5000 | 123456 |
+|   20000 | 123461 |
+|   35000 | 123457 |
+|   40000 | 123462 |
+|   60000 | 123458 |
++---------+--------+
+mysql> select branch_name,branch_city,assests from branch order by branch_city desc,assests desc;
++---------------+-------------+---------+
+| branch_name   | branch_city | assests |
++---------------+-------------+---------+
+| maruthinagar  | hydrabad    |  200568 |
+| vittalnagar   | hydrabad    |   35000 |
+| kasthurinagar | delhi       |  154330 |
+| koramangala   | bengaluru   |  200567 |
+| sadashivnagar | bengaluru   |  154330 |
++---------------+-------------+---------+
+mysql> select avg(balance) from account where branch_name='sadashivnagar';
++--------------+
+| avg(balance) |
++--------------+
+|        37500 |
++--------------+
+mysql> select branch_name from loan;
++---------------+
+| branch_name   |
++---------------+
+| kasthurinagar |
+| maruthinagar  |
+| sadashivnagar |
+| vittalnagar   |
++---------------+
+mysql> select branch_name as branch_not_taking_loan from branch where branch_name not in (select branch_name from loan);
++------------------------+
+| branch_not_taking_loan |
++------------------------+
+| koramangala            |
++------------------------+
+mysql> select branch_name from branch where branch_city="banglore";
+Empty set (0.00 sec)
+
+mysql> select count(*) from account group by branch_name;
++----------+
+| count(*) |
++----------+
+|        1 |
+|        1 |
+|        2 |
+|        1 |
++----------+
+mysql> select branch_name,count(*) from account group by branch_name;
++---------------+----------+
+| branch_name   | count(*) |
++---------------+----------+
+| koramangala   |        1 |
+| maruthinagar  |        1 |
+| sadashivnagar |        2 |
+| vittalnagar   |        1 |
++---------------+----------+
+mysql> select branch_name,count(*) as number_of_accounts from account group by branch_name;
++---------------+--------------------+
+| branch_name   | number_of_accounts |
++---------------+--------------------+
+| koramangala   |                  1 |
+| maruthinagar  |                  1 |
+| sadashivnagar |                  2 |
+| vittalnagar   |                  1 |
++---------------+--------------------+
+mysql> select sum(balance) from account group by branch_name;
++--------------+
+| sum(balance) |
++--------------+
+|         5000 |
+|        20000 |
+|        75000 |
+|        60000 |
++--------------+
+mysql> select sum(amount) from loan group by branch_name;
++-------------+
+| sum(amount) |
++-------------+
+|     50500.5 |
+|     60300.3 |
+|     50500.5 |
+|       25000 |
++-------------+
++---------------+--------------+
+| branch_name   | sum(balance) |
++---------------+--------------+
+| sadashivnagar |        75000 |
+| vittalnagar   |        60000 |
+| maruthinagar  |        20000 |
++---------------+--------------+
+3 rows in set (0.02 sec)
+
+mysql> select*from customer;
++-----------+---------------+-----------+
+| cust_name | cust_street   | cust_city |
++-----------+---------------+-----------+
+| abhay     | kamalanagar   | tumkur    |
+| ikith     | dhuranagar    | hydrabad  |
+| kavya     | sadashivngar  | bengaluru |
+| kshamitha | marutilayout  | tmkur     |
+| sheeta    | kasthurinagar | bengaluru |
++-----------+---------------+-----------+
+5 rows in set (0.01 sec)
+
+mysql> select cust_city from customer where (select accno from account where accno=123456);
++-----------+
+| cust_city |
++-----------+
+| tumkur    |
+| hydrabad  |
+| bengaluru |
+| tmkur     |
+| bengaluru |
++-----------+
+mysql> select branch_name from branch where branch_name  not in (select branch_name from account);
++---------------+
+| branch_name   |
++---------------+
+| kasthurinagar |
++---------------+
+mysql> select cust_city from customer c, depositor d, account a where c.cust_name=d.cust_name and a.accno=d.accno and a.accno=123456;
++-----------+
+| cust_city |
++-----------+
+| tumkur    |
++-----------+
+mysql> select branch_city from branch UNION select cust_city from customer;
++-------------+
+| branch_city |
++-------------+
+| delhi       |
+| bengaluru   |
+| hydrabad    |
+| tumkur      |
+| tmkur       |
++-------------+
+5 rows in set (0.00 sec)
+mysql> select branch_name from branch where branch_name in (select branch_name from loan);
++---------------+
+| branch_name   |
++---------------+
+| kasthurinagar |
+| maruthinagar  |
+| sadashivnagar |
+| vittalnagar   |
++---------------+
+4 rows in set (0.01 sec)
